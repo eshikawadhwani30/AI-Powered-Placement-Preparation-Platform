@@ -41,7 +41,7 @@ export const getDashboardData = async (req, res, next) => {
     const profileCompleteness = Math.round((completedFields / totalFields) * 100);
 
     let latestResume = null;
-    let totalDSAQuestions = 15;
+    let totalDSAQuestions = 0;
     let solvedDSACount = 0;
     let bookmarkedDSACount = 0;
     let aptitudeAttempts = [];
@@ -56,7 +56,7 @@ export const getDashboardData = async (req, res, next) => {
       latestResume = await Resume.findOne({ user: userId }).sort({ createdAt: -1 });
 
       // 3. DSA
-      totalDSAQuestions = (await DSAQuestion.countDocuments()) || 15;
+      totalDSAQuestions = await DSAQuestion.countDocuments();
       solvedDSACount = await DSAProgress.countDocuments({ user: userId, isSolved: true });
       bookmarkedDSACount = await DSAProgress.countDocuments({ user: userId, isBookmarked: true });
 
@@ -204,7 +204,7 @@ export const getDashboardData = async (req, res, next) => {
     );
 
     let readinessLevel = 'Beginner / Getting Started';
-    if (readinessScore >= 80) readinessLevel = 'Job Ready (High Placement Probability)';
+    if (readinessScore >= 80) readinessLevel = 'Job Ready (Strong Preparation Progress)';
     else if (readinessScore >= 60) readinessLevel = 'Placement Contender (Solid Preparation)';
     else if (readinessScore >= 35) readinessLevel = 'Intermediate (Building Momentum)';
 

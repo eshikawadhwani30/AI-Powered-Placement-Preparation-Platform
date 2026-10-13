@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node src/tests/authTest.js && node src/tests/dashboardTest.js && node src/tests/resumeTest.js && node src/tests/interviewTest.js && node src/tests/jobsTest.js"
+    "test": "node src/tests/authTest.js && node src/tests/dashboardTest.js && node src/tests/resumeTest.js && node src/tests/interviewTest.js && node src/tests/jobsTest.js && node src/tests/learningModulesTest.js"
   },
   "keywords": [
     "placement",

@@ -1,35 +1,26 @@
-import React from 'react';
-import { HiOutlineCodeBracketSquare } from 'react-icons/hi2';
+import React, { useEffect, useState } from 'react';
+import { HiOutlineBookmark, HiOutlineCodeBracketSquare } from 'react-icons/hi2';
+import dsaApi from '../api/dsaApi';
+import LoadingSpinner from '../components/LoadingSpinner';
+import ErrorMessage from '../components/ErrorMessage';
+
+const topics = ['All', 'Arrays', 'Strings', 'Linked Lists', 'Stacks', 'Queues', 'Trees', 'Graphs', 'Recursion', 'Searching', 'Sorting', 'Greedy Algorithms', 'Dynamic Programming'];
 
 const DSAPracticePage = () => {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-          <HiOutlineCodeBracketSquare className="w-6 h-6" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">DSA Learning & Practice</h1>
-          <p className="text-xs text-slate-500">
-            Topic-wise questions from Arrays to DP with difficulty filters and bookmarks
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-xs text-center max-w-xl mx-auto">
-        <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-          <HiOutlineCodeBracketSquare className="w-8 h-8" />
-        </div>
-        <h3 className="text-lg font-bold text-slate-900 mb-2">DSA Question Bank Prepared</h3>
-        <p className="text-sm text-slate-600 mb-6">
-          Categorized problem library, bookmarking, and completion tracking will be connected in Phase 7.
-        </p>
-        <div className="text-xs font-semibold px-3 py-2 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-200/60 inline-block">
-          11 Algorithmic Topics Supported
-        </div>
-      </div>
-    </div>
-  );
+  const [questions, setQuestions] = useState([]); const [stats, setStats] = useState(null);
+  const [filters, setFilters] = useState({ topic: 'All', difficulty: 'All', status: 'all' });
+  const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [expanded, setExpanded] = useState(null);
+  const load = async () => { setLoading(true); setError(''); try { const [q, s] = await Promise.all([dsaApi.getQuestions(filters), dsaApi.getStats()]); setQuestions(q.data || []); setStats(s.data); } catch (e) { setError(e.response?.data?.message || 'Could not load the DSA question bank.'); } finally { setLoading(false); } };
+  useEffect(() => { load(); }, [filters.topic, filters.difficulty, filters.status]);
+  const update = async (question, values) => { try { await dsaApi.updateProgress({ questionId: question._id, ...values }); await load(); } catch (e) { setError(e.response?.data?.message || 'Could not save progress.'); } };
+  const pill = (active) => `px-3 py-1.5 rounded-lg text-xs font-semibold ${active ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'}`;
+  return <div className="space-y-6 max-w-6xl mx-auto pb-12">
+    <div className="flex items-center gap-3"><div className="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center"><HiOutlineCodeBracketSquare className="w-6 h-6" /></div><div><h1 className="text-2xl font-bold text-slate-900">DSA Learning & Practice</h1><p className="text-xs text-slate-500">Track solutions, bookmarks, and practice recommendations. Code execution is not provided.</p></div></div>
+    {error && <ErrorMessage message={error} onDismiss={() => setError('')} />}
+    {stats && <div className="grid grid-cols-2 md:grid-cols-4 gap-3">{[['Solved', `${stats.solvedCount}/${stats.totalQuestions}`], ['Completion', `${stats.percentage}%`], ['Bookmarks', stats.bookmarkedCount], ['Next topic', stats.nextRecommendation?.topic || '—']].map(([label, value]) => <div key={label} className="bg-white border border-slate-200 rounded-2xl p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-1 text-xl font-bold text-slate-900">{value}</p></div>)}</div>}
+    <div className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col gap-3"><div className="flex flex-wrap gap-2">{topics.map(t => <button key={t} onClick={() => setFilters(f => ({ ...f, topic: t }))} className={pill(filters.topic === t)}>{t}</button>)}</div><div className="flex flex-wrap gap-2">{['All', 'Easy', 'Medium', 'Hard'].map(d => <button key={d} onClick={() => setFilters(f => ({ ...f, difficulty: d }))} className={pill(filters.difficulty === d)}>{d}</button>)}{['all', 'solved', 'unsolved', 'bookmarked'].map(s => <button key={s} onClick={() => setFilters(f => ({ ...f, status: s }))} className={pill(filters.status === s)}>{s[0].toUpperCase() + s.slice(1)}</button>)}</div></div>
+    {loading ? <LoadingSpinner text="Loading practice questions..." /> : questions.length === 0 ? <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-500">No questions match these filters yet.</div> : <div className="space-y-3">{questions.map(q => <div key={q._id} className="bg-white rounded-2xl border border-slate-200 p-5"><div className="flex gap-3 justify-between"><div><div className="flex flex-wrap gap-2 mb-2"><span className="text-xs bg-slate-100 px-2 py-1 rounded-md">{q.topic}</span><span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md">{q.difficulty}</span></div><h2 className="font-bold text-slate-900">{q.title}</h2><p className="text-sm text-slate-600 mt-1">{q.description}</p></div><div className="flex shrink-0 gap-2"><button aria-label="Toggle bookmark" onClick={() => update(q, { isBookmarked: !q.isBookmarked })} className={`p-2 h-9 rounded-lg ${q.isBookmarked ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'}`}><HiOutlineBookmark className="w-5 h-5" /></button><button onClick={() => update(q, { isSolved: !q.isSolved })} className={`px-3 h-9 rounded-lg text-xs font-bold ${q.isSolved ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-600 text-white'}`}>{q.isSolved ? 'Solved' : 'Mark solved'}</button></div></div><button onClick={() => setExpanded(expanded === q._id ? null : q._id)} className="mt-3 text-xs font-semibold text-emerald-700">{expanded === q._id ? 'Hide details' : 'Show example, constraints & hint'}</button>{expanded === q._id && <div className="mt-3 grid md:grid-cols-3 gap-3 text-xs"><div className="p-3 bg-slate-50 rounded-xl"><b>Example</b><p className="mt-1 whitespace-pre-wrap">{q.examples?.[0]?.input} → {q.examples?.[0]?.output}</p></div><div className="p-3 bg-slate-50 rounded-xl"><b>Constraints</b><p className="mt-1">{q.constraints?.join(' · ') || 'None provided'}</p></div><div className="p-3 bg-slate-50 rounded-xl"><b>Hint</b><p className="mt-1">{q.hints?.[0] || 'Work through a small example first.'}</p></div></div>}</div>)}</div>}
+  </div>;
 };
 
 export default DSAPracticePage;

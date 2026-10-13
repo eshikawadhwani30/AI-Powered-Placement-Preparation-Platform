@@ -155,7 +155,7 @@ const DashboardPage = () => {
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Resume ATS Score
+                Resume quality estimate
               </span>
               <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
                 <HiOutlineDocumentText className="w-5 h-5" />
@@ -165,7 +165,9 @@ const DashboardPage = () => {
               {resume.hasResume ? `${resume.score} / 100` : 'Not Uploaded'}
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              {resume.hasResume ? `File: ${resume.fileName}` : 'Upload PDF for ATS feedback'}
+              {resume.hasResume
+                ? `File: ${resume.fileName} · AI estimate, not an ATS score`
+                : 'Upload a PDF for AI resume feedback'}
             </p>
             {resume.missingSkills && resume.missingSkills.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1">

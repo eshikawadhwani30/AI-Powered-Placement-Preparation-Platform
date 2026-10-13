@@ -15,6 +15,10 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import interviewRoutes from './routes/interviewRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
+import dsaRoutes from './routes/dsaRoutes.js';
+import aptitudeRoutes from './routes/aptitudeRoutes.js';
+import roadmapRoutes from './routes/roadmapRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 
@@ -68,6 +72,20 @@ const globalLimiter = rateLimit({
 });
 app.use('/api', globalLimiter);
 
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many AI requests. Please wait a few minutes and try again.',
+  },
+});
+app.use('/api/resume', aiLimiter);
+app.use('/api/interview', aiLimiter);
+app.use('/api/roadmap', aiLimiter);
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   const db = getDBStatus();
@@ -94,6 +112,10 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/interview', interviewRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/dsa', dsaRoutes);
+app.use('/api/aptitude', aptitudeRoutes);
+app.use('/api/roadmap', roadmapRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Root welcome route
 app.get('/', (req, res) => {

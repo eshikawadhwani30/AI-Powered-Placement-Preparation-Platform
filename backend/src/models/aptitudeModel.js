@@ -40,6 +40,7 @@ const aptitudeQuestionSchema = new mongoose.Schema(
     explanation: {
       type: String,
       default: '',
+      select: false,
     },
   },
   {
@@ -61,17 +62,37 @@ const aptitudeAttemptSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    status: {
+      type: String,
+      enum: ['in_progress', 'completed'],
+      default: 'completed',
+      index: true,
+    },
+    startedAt: {
+      type: Date,
+      default: Date.now,
+    },
+    durationLimitSeconds: {
+      type: Number,
+      default: 600,
+    },
+    questionIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AptitudeQuestion',
+      },
+    ],
     totalQuestions: {
       type: Number,
-      required: true,
+      default: 0,
     },
     correctAnswers: {
       type: Number,
-      required: true,
+      default: 0,
     },
     scorePercentage: {
       type: Number,
-      required: true,
+      default: 0,
       min: 0,
       max: 100,
     },
