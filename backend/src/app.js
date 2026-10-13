@@ -8,6 +8,10 @@ import { getDBStatus } from './config/db.js';
 import { getGeminiClient } from './config/gemini.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
+// Route imports
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+
 const app = express();
 
 // Secure HTTP headers
@@ -78,6 +82,10 @@ app.get('/api/health', (req, res) => {
     },
   });
 });
+
+// Mount API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Root welcome route
 app.get('/', (req, res) => {
