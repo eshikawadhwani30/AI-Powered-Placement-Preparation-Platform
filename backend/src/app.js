@@ -11,6 +11,7 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 // Route imports
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 const app = express();
 
@@ -86,6 +87,7 @@ app.get('/api/health', (req, res) => {
 // Mount API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Root welcome route
 app.get('/', (req, res) => {

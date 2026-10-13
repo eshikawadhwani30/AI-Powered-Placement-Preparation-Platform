@@ -2,14 +2,19 @@ import dotenv from 'dotenv';
 import http from 'http';
 import app from './app.js';
 import { connectDB } from './config/db.js';
+import { seedSampleData } from './utils/seedData.js';
 
 // Load environment variables from .env file
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB and seed baseline data
+connectDB().then((conn) => {
+  if (conn) {
+    seedSampleData();
+  }
+});
 
 // Create HTTP server
 const server = http.createServer(app);
