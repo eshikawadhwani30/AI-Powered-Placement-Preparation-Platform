@@ -1,0 +1,13 @@
+{
+  "name": "ai-placement-prep-platform",
+  "version": "1.0.0",
+  "description": "AI-Powered Placement Preparation Platform (MERN + Google Gemini AI)",
+  "scripts": {
+    "server": "npm run dev --prefix backend",
+    "server:start": "npm run start --prefix backend",
+    "client": "npm run dev --prefix frontend",
+    "client:build": "npm run build --prefix frontend"
+  },
+  "author": "",
+  "license": "ISC"
+}
